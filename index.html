@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Anel O-Ring</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8); /* Overlay claro para melhorar a legibilidade */
+            z-index: -1;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            border: 1px solid #ccc;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+        label {
+            margin: 10px 0 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            width: 100%;
+        }
+        input:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+            color: #dc3545;
+        }
+        .credito {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Anel O-Ring</h1>
+        <form method="POST">
+            <div class="input-group">
+                <label for="largura">Largura da Canaleta (mm):</label>
+                <input type="number" step="0.01" name="largura" id="largura" required
+                       value="<?php echo isset($_POST['largura']) ? htmlspecialchars($_POST['largura']) : ''; ?>">
+
+                <label for="profundidade">Profundidade (mm):</label>
+                <input type="number" step="0.01" name="profundidade" id="profundidade" required
+                       value="<?php echo isset($_POST['profundidade']) ? htmlspecialchars($_POST['profundidade']) : ''; ?>">
+
+                <label for="folga">Folga (mm):</label>
+                <input type="number" step="0.01" name="folga" id="folga" required min="0"
+                       value="<?php echo isset($_POST['folga']) ? htmlspecialchars($_POST['folga']) : ''; ?>">
+            </div>
+            <button type="submit">Calcular</button>
+        </form>
+
+        <?php
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $largura = filter_input(INPUT_POST, 'largura', FILTER_VALIDATE_FLOAT);
+            $profundidade = filter_input(INPUT_POST, 'profundidade', FILTER_VALIDATE_FLOAT);
+            $folga = filter_input(INPUT_POST, 'folga', FILTER_VALIDATE_FLOAT);
+
+            if ($largura === false || $profundidade === false || $folga === false || $largura <= 0 || $profundidade <= 0 || $folga < 0) {
+                echo "<div class='result error'>Por favor, insira valores válidos. A folga pode ser 0.</div>";
+            } else {
+                // Cálculos
+                $diametroMin = sqrt(((($profundidade + $folga) * $largura) * 3) / 3.1415);
+                $diametroMax = sqrt(((($profundidade + $folga) * $largura) * 3.5) / 3.1415);
+                $diametroMedio = ($diametroMin + $diametroMax) / 2;
+                $areaCanaleta = $largura * ($profundidade + $folga);
+
+                // Tabela de referência
+                $tabelaOring = [
+                    ['diametro' => 2.0, 'area' => 3.1],
+                    ['diametro' => 2.1, 'area' => 3.5],
+                    ['diametro' => 2.2, 'area' => 3.8],
+                    ['diametro' => 2.3, 'area' => 4.2],
+                    ['diametro' => 2.4, 'area' => 4.5],
+                    ['diametro' => 2.5, 'area' => 4.9],
+                    ['diametro' => 2.6, 'area' => 5.3],
+                    ['diametro' => 2.7, 'area' => 5.7],
+                    ['diametro' => 2.8, 'area' => 6.2],
+                    ['diametro' => 2.9, 'area' => 6.6],
+                    ['diametro' => 3.0, 'area' => 7.1],
+                    ['diametro' => 3.1, 'area' => 7.5],
+                    ['diametro' => 3.2, 'area' => 8.0],
+                    ['diametro' => 3.3, 'area' => 8.6],
+                    ['diametro' => 3.4, 'area' => 9.1],
+                    ['diametro' => 3.5, 'area' => 9.6],
+                    ['diametro' => 3.6, 'area' => 10.2],
+                    ['diametro' => 3.7, 'area' => 10.8],
+                    ['diametro' => 3.8, 'area' => 11.3],
+                    ['diametro' => 3.9, 'area' => 11.9],
+                    ['diametro' => 4.0, 'area' => 12.6],
+                    ['diametro' => 4.1, 'area' => 13.2],
+                    ['diametro' => 4.2, 'area' => 13.9],
+                    ['diametro' => 4.3, 'area' => 14.5],
+                    ['diametro' => 4.4, 'area' => 15.2],
+                    ['diametro' => 4.5, 'area' => 15.9],
+                    ['diametro' => 4.6, 'area' => 16.6],
+                    ['diametro' => 4.7, 'area' => 17.3],
+                    ['diametro' => 4.8, 'area' => 18.1],
+                    ['diametro' => 4.9, 'area' => 18.9],
+                    ['diametro' => 5.0, 'area' => 19.6],
+                    ['diametro' => 5.1, 'area' => 20.4],
+                    ['diametro' => 5.2, 'area' => 21.2],
+                    ['diametro' => 5.3, 'area' => 22.1],
+                    ['diametro' => 5.4, 'area' => 22.9],
+                    ['diametro' => 5.5, 'area' => 23.8],
+                    ['diametro' => 5.6, 'area' => 24.6],
+                    ['diametro' => 5.7, 'area' => 25.5],
+                    ['diametro' => 5.8, 'area' => 26.4],
+                    ['diametro' => 5.9, 'area' => 27.3],
+                    ['diametro' => 6.0, 'area' => 28.3],
+                    ['diametro' => 6.1, 'area' => 29.2],
+                    ['diametro' => 6.2, 'area' => 30.2],
+                    ['diametro' => 6.3, 'area' => 31.2],
+                    ['diametro' => 6.4, 'area' => 32.2],
+                    ['diametro' => 6.5, 'area' => 33.2],
+                    ['diametro' => 6.6, 'area' => 34.2],
+                    ['diametro' => 6.7, 'area' => 35.3],
+                    ['diametro' => 6.8, 'area' => 36.3],
+                    ['diametro' => 6.9, 'area' => 37.4],
+                    ['diametro' => 7.0, 'area' => 38.5],
+                    ['diametro' => 7.1, 'area' => 39.6],
+                    ['diametro' => 7.2, 'area' => 40.7],
+                    ['diametro' => 7.3, 'area' => 41.9],
+                    ['diametro' => 7.4, 'area' => 43.0],
+                    ['diametro' => 7.5, 'area' => 44.2],
+                    ['diametro' => 7.6, 'area' => 45.4],
+                    ['diametro' => 7.7, 'area' => 46.6],
+                    ['diametro' => 7.8, 'area' => 47.8],
+                    ['diametro' => 7.9, 'area' => 49.0],
+                    ['diametro' => 8.0, 'area' => 50.3],
+                    ['diametro' => 8.1, 'area' => 51.5],
+                    ['diametro' => 8.2, 'area' => 52.8],
+                    ['diametro' => 8.3, 'area' => 54.1],
+                    ['diametro' => 8.4, 'area' => 55.4],
+                    ['diametro' => 8.5, 'area' => 56.7],
+                    ['diametro' => 8.6, 'area' => 58.1],
+                    ['diametro' => 8.7, 'area' => 59.4],
+                    ['diametro' => 8.8, 'area' => 60.8],
+                    ['diametro' => 8.9, 'area' => 62.2],
+                    ['diametro' => 9.0, 'area' => 63.6],
+                    ['diametro' => 9.1, 'area' => 65.0],
+                    ['diametro' => 9.2, 'area' => 66.5],
+                    ['diametro' => 9.3, 'area' => 67.9],
+                    ['diametro' => 9.4, 'area' => 69.4],
+                    ['diametro' => 9.5, 'area' => 70.9],
+                    ['diametro' => 9.6, 'area' => 72.4],
+                    ['diametro' => 9.7, 'area' => 73.9],
+                    ['diametro' => 9.8, 'area' => 75.4],
+                    ['diametro' => 9.9, 'area' => 77.0],
+                    ['diametro' => 10.0, 'area' => 78.5],
+                ];
+
+                // Encontrar o anel recomendado
+                $anelRecomendado = null;
+                $menorDiferenca = PHP_FLOAT_MAX;
+
+                foreach ($tabelaOring as $anel) {
+                    $diferenca = abs($anel['diametro'] - $diametroMedio);
+                    if ($diferenca < $menorDiferenca) {
+                        $menorDiferenca = $diferenca;
+                        $anelRecomendado = $anel;
+                    }
+                }
+
+                // Exibir resultados
+                echo "<div class='result'>";
+                echo "<p><strong>Diâmetro Mínimo do Anel:</strong> " . number_format($diametroMin, 2) . " mm</p>";
+                echo "<p><strong>Diâmetro Máximo do Anel:</strong> " . number_format($diametroMax, 2) . " mm</p>";
+                echo "<p><strong>Diâmetro Médio do Anel:</strong> " . number_format($diametroMedio, 2) . " mm</p>";
+                echo "<p><strong>Área da Canaleta:</strong> " . number_format($areaCanaleta, 2) . " mm²</p>";
+
+                if ($anelRecomendado) {
+                    echo "<p><strong>Anel O-Ring Recomendado:</strong></p>";
+                    echo "<p>Diâmetro: " . $anelRecomendado['diametro'] . " mm</p>";
+                    echo "<p>Área do Anel: " . $anelRecomendado['area'] . " mm²</p>";
+
+                    // Comparar áreas
+                    $diferencaArea = abs($areaCanaleta - $anelRecomendado['area']);
+                    if ($diferencaArea <= 1.0) {
+                        echo "<p><strong>Atenção:</strong> A área da canaleta é compatível com a área do anel O-Ring recomendado.</p>";
+                    } else {
+                        // Encontrar o anel com a área mais próxima
+                        $anelCompativel = null;
+                        $menorDiferencaArea = PHP_FLOAT_MAX;
+
+                        foreach ($tabelaOring as $anel) {
+                            $diferenca = abs($areaCanaleta - $anel['area']);
+                            if ($diferenca < $menorDiferencaArea) {
+                                $menorDiferencaArea = $diferenca;
+                                $anelCompativel = $anel;
+                            }
+                        }
+
+                        if ($anelCompativel) {
+                            echo "<p><strong>Atenção:</strong> A área da canaleta não é compatível com o anel recomendado. O anel mais próximo é:</p>";
+                            echo "<p>Diâmetro: " . $anelCompativel['diametro'] . " mm</p>";
+                            echo "<p>Área do Anel: " . $anelCompativel['area'] . " mm²</p>";
+                        }
+                    }
+                } else {
+                    echo "<p><strong>Erro:</strong> Nenhum anel O-Ring adequado encontrado na tabela.</p>";
+                }
+                echo "</div>";
+            }
+        }
+        ?>
+        <!-- Crédito no canto inferior -->
+        <p class="credito">
+            by RC.NET | copiringt 2025
+        </p>
+    </div>
+</body>
+</html>
